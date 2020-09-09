@@ -12,8 +12,8 @@
     <groupId>com.alchemy.gateway</groupId>
     <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>parent</name>
-    <description>量化平台网关项目</description>
+    <name>exchange-gateway</name>
+    <description>exchange对接API项目</description>
     <packaging>pom</packaging>
 
     <properties>

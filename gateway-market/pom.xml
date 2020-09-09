@@ -6,7 +6,7 @@
         <groupId>com.alchemy.gateway</groupId>
         <artifactId>parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>..</relativePath> <!-- lookup parent from repository -->
+<!--        <relativePath>..</relativePath> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
     </parent>
 
     <artifactId>market</artifactId>
