@@ -1,0 +1,17 @@
+stages:
+- build
+
+build-image:
+  stage: build
+  only:
+  - dev
+  tags:
+  - lianghua
+  variables:
+    BUILD_WHAT: parent
+    DEPLOY_ENVIRONMENT_ID: 1
+  script:
+  - builder -d 
+  
+    
+
