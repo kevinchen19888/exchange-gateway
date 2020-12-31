@@ -1,6 +1,0 @@
-com.alchemy.gateway.exchangeclients.binance.BinanceExchangeApi
-com.alchemy.gateway.exchangeclients.huobi.HuobiExchangeApi
-com.alchemy.gateway.exchangeclients.okex.OkexExchangeApi
-#com.alchemy.gateway.exchangeclients.bitmex.BitmexExchangeApi
-com.alchemy.gateway.exchangeclients.bitfinex.BitfinexExchangeApi
-
