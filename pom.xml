@@ -8,6 +8,7 @@
         <module>core</module>
         <module>huobi-api</module>
         <module>okex-api</module>
+        <module>binance-api</module>
     </modules>
 
     <parent>
