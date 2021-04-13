@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * 3,配置 打新开始时间/账户id/订单类型/打新币对/购买金额...(所有参数参考说明)
  * 4,配置完成后运行程序
  */
-public class NewCoinTrade {
+public class HuobiNewCoinTrade {
 
     @SneakyThrows
     public static void main(String[] args) {
@@ -46,18 +46,6 @@ public class NewCoinTrade {
 
         monitorAndPlaceOrder(startTime, req);
     }
-
-    @Data
-    private static class OrderResp {
-        private String status;
-        private String data;
-        @JsonAlias("err-code")
-        private String errCode;
-        @JsonAlias("err-msg")
-        private String errMsg;
-    }
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final OkHttpClient httpClient = new OkHttpClient();
 
     private static void monitorAndPlaceOrder(LocalDateTime beginTime, OrderReq param) {
         String apiKey = System.getenv("API_KEY");
@@ -94,7 +82,7 @@ public class NewCoinTrade {
                     // 下单成功则不再执行程序
                     OrderResp respObj = MAPPER.readValue(resp, OrderResp.class);
                     if ("ok".equals(respObj.getStatus())) {
-                        System.out.println("成功下单,结束执行=====<>");
+                        System.out.println("成功下单,结束执行===========>");
                         break;
                     }
                     Thread.sleep(100);
@@ -108,12 +96,24 @@ public class NewCoinTrade {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println("出现异常:" + ex);
+                System.out.println("出现异常,程序退出:" + ex);
                 break;
             }
         }
-
     }
+
+    @Data
+    private static class OrderResp {
+        private String status;
+        private String data;
+        @JsonAlias("err-code")
+        private String errCode;
+        @JsonAlias("err-msg")
+        private String errMsg;
+    }
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private static final OkHttpClient httpClient = new OkHttpClient();
 
     public static Map<String, Object> createSignature(String appKey, String appSecretKey, String method, String uri,
                                                       Map<String, Object> paramMap) {
@@ -186,7 +186,7 @@ public class NewCoinTrade {
     @Builder
     private static class OrderReq {
         /**
-         * 账户id:可以在登录web端后进入调试界面(按F12)通过点击:订单 菜单下的任意一个子菜单(如币币&杠杆订单)
+         * 账户id:可以在登录web端后进入调试界面(按F12)通过点击:'订单'菜单下的任意一个子菜单(如币币&杠杆订单)
          * 获取返回后的响应结果,然后通过调试工具中的 search工具搜索关键字:account-id 获取;
          */
         private String accountId;
