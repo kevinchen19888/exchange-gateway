@@ -1,4 +1,4 @@
-package com.kevin.gateway;
+package com.kevin.gateway.strategy;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.ObjectMapper;

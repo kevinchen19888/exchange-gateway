@@ -9,10 +9,9 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <name>exchange-gateway基础module</name>
+    <name>core-module</name>
     <artifactId>core</artifactId>
     <version>1.0-SNAPSHOT</version>
-
 
     <dependencies>
         <dependency>
