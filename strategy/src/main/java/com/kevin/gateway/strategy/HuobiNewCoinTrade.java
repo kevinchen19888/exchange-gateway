@@ -30,18 +30,20 @@ import java.util.stream.Collectors;
  */
 public class HuobiNewCoinTrade {
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss");
+
     @SneakyThrows
     public static void main(String[] args) {
         // 设置的开始时间比交易所公告的打新时间早2s
-        LocalDateTime startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(14, 59, 58));
-        System.out.println("打新开始时间:" + startTime.format(DateTimeFormatter.ISO_DATE_TIME));
+        LocalDateTime startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(15, 44, 58));
+        System.out.println("打新开始时间:" + startTime.format(FORMATTER));
 
         OrderReq req = OrderReq.builder()
                 .accountId("11400926")
                 .type(OrderType.BUY_LIMIT)
-                .symbol("raiusdt")
-                .amount(BigDecimal.valueOf(3))
-                .price(BigDecimal.valueOf(1.8))
+                .symbol("forthusdt")
+                .amount(BigDecimal.valueOf(2))
+                .price(BigDecimal.valueOf(51))
                 .build();
 
         monitorAndPlaceOrder(startTime, req);
@@ -87,7 +89,7 @@ public class HuobiNewCoinTrade {
                     }
                     Thread.sleep(100);
                 } else {
-                    System.out.println("时间不满足  sleep 1s");
+                    System.out.println("时间不满足  sleep 1s,现在时间:" + LocalDateTime.now().format(FORMATTER));
                     Thread.sleep(1000);
                 }
             } catch (Exception ex) {
@@ -111,6 +113,7 @@ public class HuobiNewCoinTrade {
         @JsonAlias("err-msg")
         private String errMsg;
     }
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final OkHttpClient httpClient = new OkHttpClient();
