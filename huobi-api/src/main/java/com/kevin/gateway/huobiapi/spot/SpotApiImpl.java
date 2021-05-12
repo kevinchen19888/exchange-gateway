@@ -14,6 +14,7 @@ import com.kevin.gateway.huobiapi.spot.request.SpotAccountTransferRequest;
 import com.kevin.gateway.huobiapi.spot.request.SpotApiWindow;
 import com.kevin.gateway.huobiapi.spot.request.SpotFuturesTransferRequest;
 import com.kevin.gateway.huobiapi.spot.request.SpotPointTransferRequest;
+import com.kevin.gateway.huobiapi.spot.response.SpotBatchOrderResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.*;
 import com.kevin.gateway.huobiapi.spot.response.account.*;
 import com.kevin.gateway.huobiapi.spot.response.baseInfo.SpotCommonCurrencysResponse;
@@ -331,6 +332,8 @@ public class SpotApiImpl extends HuobiAbstractImpl implements SpotApi {
 
     private final PrivatePostTemplate POINT_TRANSFER = PrivatePostTemplate.
             of("/v2/point/transfer", 2, Duration.ofSeconds(1L));
+    private final PrivatePostTemplate BATCH_ORDER = PrivatePostTemplate.
+            of("/v1/order/batch-orders", 40, Duration.ofSeconds(2L));
 
     @Override
     public SpotPointTransferVo pointTransfer(Credentials credentials, SpotPointTransferRequest request) {
@@ -340,6 +343,13 @@ public class SpotApiImpl extends HuobiAbstractImpl implements SpotApi {
             return response.getData();
         }
         return new SpotPointTransferVo();
+    }
+
+    @Override
+    public SpotBatchOrderResponse batchOrder(Credentials credentials, List<SpotBatchOrderVo> orders) {
+        PrivatePostTemplateClient client = BATCH_ORDER.bind(environment, credentials);
+        SpotBatchOrderResponse resp = client.postForObject(orders, SpotBatchOrderResponse.class);
+        return resp;
     }
 
     /**

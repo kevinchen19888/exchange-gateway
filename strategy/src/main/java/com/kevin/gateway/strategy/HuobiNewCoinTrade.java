@@ -2,6 +2,13 @@ package com.kevin.gateway.strategy;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kevin.gateway.core.Credentials;
+import com.kevin.gateway.huobiapi.base.HuobiEnvironment;
+import com.kevin.gateway.huobiapi.spot.SpotApi;
+import com.kevin.gateway.huobiapi.spot.SpotApiImpl;
+import com.kevin.gateway.huobiapi.spot.model.SpotOrdersPlaceType;
+import com.kevin.gateway.huobiapi.spot.response.SpotBatchOrderResponse;
+import com.kevin.gateway.huobiapi.spot.vo.SpotBatchOrderVo;
 import lombok.Builder;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -9,6 +16,7 @@ import okhttp3.*;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
@@ -31,67 +39,76 @@ import java.util.stream.Collectors;
 public class HuobiNewCoinTrade {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd:HH:mm:ss");
+    private static final SpotApi huobiApi = new SpotApiImpl(HuobiEnvironment.PRODUCT);
+    private static Credentials credentials;
 
     @SneakyThrows
     public static void main(String[] args) {
         // 设置的开始时间比交易所公告的打新时间早2s
-        LocalDateTime startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(15, 44, 58));
-        System.out.println("打新开始时间:" + startTime.format(FORMATTER));
+        LocalDateTime startTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(17, 59, 58));
+        System.out.println("huobi打新开始时间:" + startTime.format(FORMATTER));
 
         OrderReq req = OrderReq.builder()
                 .accountId("11400926")
                 .type(OrderType.BUY_LIMIT)
-                .symbol("forthusdt")
-                .amount(BigDecimal.valueOf(2))
-                .price(BigDecimal.valueOf(51))
+                .symbol("nuusdt")
+                .amount(BigDecimal.valueOf(500))
+                .price(BigDecimal.valueOf(0.48))
                 .build();
 
-        monitorAndPlaceOrder(startTime, req);
+        //monitorAndPlaceOrder(startTime, req);
+
+        // todo 批量下单
+        SpotBatchOrderVo o1 = SpotBatchOrderVo.builder()
+                .accountId("11400926")
+                .type(SpotOrdersPlaceType.BUY_LIMIT)
+                .source("spot-api")
+                .symbol("htusdt") // 上新币种
+                .amount(new BigDecimal("2"))
+                .price(new BigDecimal("4"))
+                .build();
+        SpotBatchOrderVo o2 = SpotBatchOrderVo.builder()
+                .accountId("11400926")
+                .type(SpotOrdersPlaceType.BUY_LIMIT)
+                .source("spot-api")
+                .symbol("htusdt")// 上新币种
+                .amount(new BigDecimal("3"))
+                .price(new BigDecimal("2"))
+                .build();
+        List<SpotBatchOrderVo> orders = Arrays.asList(o1, o2);
+
+        batchOrder(startTime, orders);
     }
 
-    private static void monitorAndPlaceOrder(LocalDateTime beginTime, OrderReq param) {
-        String apiKey = System.getenv("API_KEY");
-        String secretKey = System.getenv("SECRET_KEY");
-        if (isBlankStr(apiKey) || isBlankStr(secretKey)) {
-            throw new IllegalArgumentException("apiKey 或 secretKey未配置环境变量");
-        }
-
-        Map<String, Object> paramMap = new HashMap<>();
+    private static void batchOrder(LocalDateTime startTime, List<SpotBatchOrderVo> orderVos) throws InterruptedException {
         while (true) {
+            if (LocalDateTime.now().isBefore(startTime)) {
+                System.out.println("时间不满足  sleep 1s,现在时间:" + LocalDateTime.now().format(FORMATTER));
+                Thread.sleep(1000);
+                continue;
+            }
+            // 批量订单下单
+            SpotBatchOrderResponse resp = huobiApi.batchOrder(credentials, orderVos);
+            if ("ok".equals(resp.getStatus())) {
+                System.out.println("成功下单,结束执行===========>");
+                break;
+            } else {
+                Thread.sleep(1000);
+                System.out.println("huobi批量下单结果错误:" + resp);
+            }
+        }
+    }
+
+    private static void monitorAndPlaceOrder(LocalDateTime beginTime, OrderReq param, Credentials credentials) {
+        boolean runFlag = true;
+        while (runFlag) {
             try {
-                if (LocalDateTime.now().isAfter(beginTime)) {
-                    paramMap.put("account-id", param.getAccountId());//
-                    paramMap.put("symbol", param.getSymbol());// raiusdt
-                    paramMap.put("type", param.getType().val);
-                    paramMap.put("amount", param.getAmount());
-                    if (OrderType.BUY_LIMIT == param.getType()) {
-                        if (param.getPrice() == null) {
-                            throw new IllegalArgumentException("限价单必须设置价格");
-                        }
-                        paramMap.put("price", param.getPrice());
-                    }
-
-                    String uri = "https://api.huobipro.com/v1/order/orders/place";
-                    Map<String, Object> requestMap = createSignature(apiKey, secretKey, "POST", uri, paramMap);
-
-                    RequestBody body = RequestBody.create(JSON_TYPE, MAPPER.writeValueAsString(requestMap));
-                    Request.Builder builder = new Request.Builder().url(uri + "?" + toQueryString(requestMap)).post(body);
-                    Request request = builder.build();
-                    Response response = httpClient.newCall(request).execute();
-
-                    String resp = response.body().string();
-                    System.out.println("响应结果:" + resp);
-                    // 下单成功则不再执行程序
-                    OrderResp respObj = MAPPER.readValue(resp, OrderResp.class);
-                    if ("ok".equals(respObj.getStatus())) {
-                        System.out.println("成功下单,结束执行===========>");
-                        break;
-                    }
-                    Thread.sleep(100);
-                } else {
+                if (LocalDateTime.now().isBefore(beginTime)) {
                     System.out.println("时间不满足  sleep 1s,现在时间:" + LocalDateTime.now().format(FORMATTER));
                     Thread.sleep(1000);
+                    continue;
                 }
+                runFlag = newOrder(param, credentials.getApiKey(), credentials.getSecretKey(), runFlag);
             } catch (Exception ex) {
                 try {
                     Thread.sleep(1000);
@@ -104,8 +121,44 @@ public class HuobiNewCoinTrade {
         }
     }
 
+
+    private static boolean newOrder(OrderReq param, String apiKey, String secretKey, boolean runFlag) throws InterruptedException, IOException {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("account-id", param.getAccountId());//
+        paramMap.put("symbol", param.getSymbol());// raiusdt
+        paramMap.put("type", param.getType().val);
+        paramMap.put("amount", param.getAmount());
+        if (OrderType.BUY_LIMIT == param.getType()) {
+            if (param.getPrice() == null) {
+                throw new IllegalArgumentException("限价单必须设置价格");
+            }
+            paramMap.put("price", param.getPrice());
+        }
+
+        String uri = "https://api.huobipro.com/v1/order/orders/place";
+        Map<String, Object> requestMap = createSignature(apiKey, secretKey, "POST", uri, paramMap);
+
+        RequestBody body = RequestBody.create(JSON_TYPE, MAPPER.writeValueAsString(requestMap));
+        Request.Builder builder = new Request.Builder().url(uri + "?" + toQueryString(requestMap)).post(body);
+        Request request = builder.build();
+        Thread.sleep(100);
+
+        Response response = httpClient.newCall(request).execute();
+
+        String resp = response.body().string();
+        System.out.println("响应结果:" + resp);
+        // 下单成功则不再执行程序
+        OrderResp respObj = MAPPER.readValue(resp, OrderResp.class);
+        if ("ok".equals(respObj.getStatus())) {
+            System.out.println("成功下单,结束执行===========>");
+            runFlag = false;
+        }
+        return runFlag;
+    }
+
     @Data
     private static class OrderResp {
+
         private String status;
         private String data;
         @JsonAlias("err-code")
@@ -183,11 +236,13 @@ public class HuobiNewCoinTrade {
     private static final DateTimeFormatter DT_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
 
     private static final ZoneId ZONE_GMT = ZoneId.of("Z");
+
     private static final MediaType JSON_TYPE = MediaType.parse("application/json");
 
     @Data
     @Builder
     private static class OrderReq {
+
         /**
          * 账户id:可以在登录web端后进入调试界面(按F12)通过点击:'订单'菜单下的任意一个子菜单(如币币&杠杆订单)
          * 获取返回后的响应结果,然后通过调试工具中的 search工具搜索关键字:account-id 获取;
@@ -228,6 +283,15 @@ public class HuobiNewCoinTrade {
         public String getVal() {
             return val;
         }
+
     }
 
+    static {
+        String apiKey = System.getenv("API_KEY");
+        String secretKey = System.getenv("SECRET_KEY");
+        if (isBlankStr(apiKey) || isBlankStr(secretKey)) {
+            throw new IllegalArgumentException("apiKey 或 secretKey未配置环境变量");
+        }
+        credentials = Credentials.of(apiKey, secretKey, null);
+    }
 }

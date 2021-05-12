@@ -10,6 +10,7 @@ import com.kevin.gateway.huobiapi.spot.request.SpotAccountTransferRequest;
 import com.kevin.gateway.huobiapi.spot.request.SpotApiWindow;
 import com.kevin.gateway.huobiapi.spot.request.SpotFuturesTransferRequest;
 import com.kevin.gateway.huobiapi.spot.request.SpotPointTransferRequest;
+import com.kevin.gateway.huobiapi.spot.response.SpotBatchOrderResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.SpotAccountHistoryResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.SpotAccountLedgerResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.SpotFuturesTransferResponse;
@@ -274,4 +275,13 @@ public interface SpotApi {
      * @return 点卡划转
      */
     SpotPointTransferVo pointTransfer(Credentials credentials, SpotPointTransferRequest request);
+
+    /**
+     * 批量下单
+     *
+     * @param credentials 凭证
+     * @param orders      订单列表
+     * @return 结果
+     */
+    SpotBatchOrderResponse batchOrder(Credentials credentials, List<SpotBatchOrderVo> orders);
 }
