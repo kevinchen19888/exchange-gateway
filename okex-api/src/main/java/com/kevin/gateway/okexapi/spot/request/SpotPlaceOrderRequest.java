@@ -1,14 +1,12 @@
 package com.kevin.gateway.okexapi.spot.request;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.kevin.gateway.core.CoinPair;
 import com.kevin.gateway.okexapi.base.util.OrderSide;
 import com.kevin.gateway.okexapi.spot.model.SpotPlaceOrderType;
 import com.kevin.gateway.okexapi.spot.model.SpotType;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -26,18 +24,18 @@ public abstract class SpotPlaceOrderRequest {
     /**
      * 币对名称
      */
-    private CoinPair instrumentId;
+    protected CoinPair instrumentId;
     /**
      * 由您设置的订单ID来识别您的订单,格式是字母（区分大小写）+数字 或者 纯字母（区分大小写），1-32位字符 （不能重复）
      */
-    private String clientOid;
+    protected String clientOid;
     /**
      * 买卖类型 buy/sell
      */
-    private OrderSide side;
+    protected OrderSide side;
 
     //订单类型 限价单 limit 市价单 market
-    //private OkexSpotType type;
+    //protected OkexSpotType type;
 
     /**
      * 参数填数字
@@ -46,7 +44,7 @@ public abstract class SpotPlaceOrderRequest {
      * 2：全部成交或立即取消（FOK）
      * 3：立即成交并取消剩余（IOC）
      */
-    private SpotPlaceOrderType orderType;
+    protected SpotPlaceOrderType orderType;
 
     public abstract String getType();
 
