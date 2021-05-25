@@ -6,15 +6,12 @@ import com.kevin.gateway.huobiapi.base.util.CandleInterval;
 import com.kevin.gateway.huobiapi.spot.model.SpotAccountType;
 import com.kevin.gateway.huobiapi.spot.model.SpotDepthType;
 import com.kevin.gateway.huobiapi.spot.model.SpotTransactType;
-import com.kevin.gateway.huobiapi.spot.request.SpotAccountTransferRequest;
-import com.kevin.gateway.huobiapi.spot.request.SpotApiWindow;
-import com.kevin.gateway.huobiapi.spot.request.SpotFuturesTransferRequest;
-import com.kevin.gateway.huobiapi.spot.request.SpotPointTransferRequest;
+import com.kevin.gateway.huobiapi.spot.request.*;
 import com.kevin.gateway.huobiapi.spot.response.SpotBatchOrderResponse;
+import com.kevin.gateway.huobiapi.spot.response.SpotOrderResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.SpotAccountHistoryResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.SpotAccountLedgerResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.SpotFuturesTransferResponse;
-import com.kevin.gateway.huobiapi.spot.vo.*;
 import com.kevin.gateway.huobiapi.spot.vo.*;
 import org.springframework.lang.Nullable;
 
@@ -284,4 +281,11 @@ public interface SpotApi {
      * @return 结果
      */
     SpotBatchOrderResponse batchOrder(Credentials credentials, List<SpotBatchOrderVo> orders);
+
+    /** 下单
+     * @param credentials 凭证
+     * @param order 订单
+     * @return 结果
+     */
+    SpotOrderResponse order(Credentials credentials, OrderRequest order);
 }

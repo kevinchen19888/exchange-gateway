@@ -4,24 +4,18 @@ import com.kevin.gateway.core.Credentials;
 import com.kevin.gateway.core.FiatCoin;
 import com.kevin.gateway.huobiapi.base.HuobiEnvironment;
 import com.kevin.gateway.huobiapi.base.rest.*;
-import com.kevin.gateway.huobiapi.base.rest.*;
 import com.kevin.gateway.huobiapi.base.rest.impl.HuobiAbstractImpl;
 import com.kevin.gateway.huobiapi.base.util.CandleInterval;
 import com.kevin.gateway.huobiapi.spot.model.SpotAccountType;
 import com.kevin.gateway.huobiapi.spot.model.SpotDepthType;
 import com.kevin.gateway.huobiapi.spot.model.SpotTransactType;
-import com.kevin.gateway.huobiapi.spot.request.SpotAccountTransferRequest;
-import com.kevin.gateway.huobiapi.spot.request.SpotApiWindow;
-import com.kevin.gateway.huobiapi.spot.request.SpotFuturesTransferRequest;
-import com.kevin.gateway.huobiapi.spot.request.SpotPointTransferRequest;
+import com.kevin.gateway.huobiapi.spot.request.*;
 import com.kevin.gateway.huobiapi.spot.response.SpotBatchOrderResponse;
-import com.kevin.gateway.huobiapi.spot.response.account.*;
+import com.kevin.gateway.huobiapi.spot.response.SpotOrderResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.*;
 import com.kevin.gateway.huobiapi.spot.response.baseInfo.SpotCommonCurrencysResponse;
 import com.kevin.gateway.huobiapi.spot.response.baseInfo.SpotMarketStatusResponse;
 import com.kevin.gateway.huobiapi.spot.response.baseInfo.SpotSymbolsResponse;
-import com.kevin.gateway.huobiapi.spot.response.marketData.*;
-import com.kevin.gateway.huobiapi.spot.vo.*;
 import com.kevin.gateway.huobiapi.spot.response.marketData.*;
 import com.kevin.gateway.huobiapi.spot.vo.*;
 import org.springframework.lang.Nullable;
@@ -334,6 +328,8 @@ public class SpotApiImpl extends HuobiAbstractImpl implements SpotApi {
             of("/v2/point/transfer", 2, Duration.ofSeconds(1L));
     private final PrivatePostTemplate BATCH_ORDER = PrivatePostTemplate.
             of("/v1/order/batch-orders", 40, Duration.ofSeconds(2L));
+    private final PrivatePostTemplate ORDER = PrivatePostTemplate.
+            of("/v1/order/orders/place", 100, Duration.ofSeconds(2L));
 
     @Override
     public SpotPointTransferVo pointTransfer(Credentials credentials, SpotPointTransferRequest request) {
@@ -348,8 +344,13 @@ public class SpotApiImpl extends HuobiAbstractImpl implements SpotApi {
     @Override
     public SpotBatchOrderResponse batchOrder(Credentials credentials, List<SpotBatchOrderVo> orders) {
         PrivatePostTemplateClient client = BATCH_ORDER.bind(environment, credentials);
-        SpotBatchOrderResponse resp = client.postForObject(orders, SpotBatchOrderResponse.class);
-        return resp;
+        return client.postForObject(orders, SpotBatchOrderResponse.class);
+    }
+
+    @Override
+    public SpotOrderResponse order(Credentials credentials, OrderRequest order) {
+        PrivatePostTemplateClient client = ORDER.bind(environment, credentials);
+        return client.postForObject(order,SpotOrderResponse.class);
     }
 
     /**

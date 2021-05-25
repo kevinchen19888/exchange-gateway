@@ -40,3 +40,18 @@ CREATE TABLE `cmc_exchange_symbols_quotation`
     `create_time`        datetime        NOT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'cmc 币种行情信息表' ROW_FORMAT = Dynamic;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

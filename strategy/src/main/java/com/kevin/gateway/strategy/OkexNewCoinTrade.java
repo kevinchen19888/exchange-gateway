@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * 1,配置环境变量:API_KEY,SECRET_KEY
  * 2,引入 okhttp3 & spring-boot-starter-json 两个依赖
  * 3,配置 打新开始时间/账户id/订单类型/打新币对/购买金额...(所有参数参考说明)
- * 4,配置完成后运行程序
+ * 4,配置完成后运行程序(程序修改为一直进行下单,直到账户资产不足抛出异常)
  */
 public class OkexNewCoinTrade {
 
