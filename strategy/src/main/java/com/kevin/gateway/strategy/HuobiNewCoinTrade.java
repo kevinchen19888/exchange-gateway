@@ -83,7 +83,6 @@ public class HuobiNewCoinTrade {
         }
     }
 
-
     public static boolean isBlankStr(String string) {
         return string == null || "".equals(string);
     }
