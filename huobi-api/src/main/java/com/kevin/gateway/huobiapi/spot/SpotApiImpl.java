@@ -13,10 +13,10 @@ import com.kevin.gateway.huobiapi.spot.request.*;
 import com.kevin.gateway.huobiapi.spot.response.SpotBatchOrderResponse;
 import com.kevin.gateway.huobiapi.spot.response.SpotOrderResponse;
 import com.kevin.gateway.huobiapi.spot.response.account.*;
-import com.kevin.gateway.huobiapi.spot.response.baseInfo.SpotCommonCurrencysResponse;
-import com.kevin.gateway.huobiapi.spot.response.baseInfo.SpotMarketStatusResponse;
-import com.kevin.gateway.huobiapi.spot.response.baseInfo.SpotSymbolsResponse;
-import com.kevin.gateway.huobiapi.spot.response.marketData.*;
+import com.kevin.gateway.huobiapi.spot.response.basedata.SpotCommonCurrencysResponse;
+import com.kevin.gateway.huobiapi.spot.response.basedata.SpotMarketStatusResponse;
+import com.kevin.gateway.huobiapi.spot.response.basedata.SpotSymbolsResponse;
+import com.kevin.gateway.huobiapi.spot.response.marketdata.*;
 import com.kevin.gateway.huobiapi.spot.vo.*;
 import org.springframework.lang.Nullable;
 
